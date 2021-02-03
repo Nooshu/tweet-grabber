@@ -102,3 +102,8 @@ dist
 
 # TernJS port file
 .tern-port
+
+# image directories
+compressed_tweets/*.jpg
+compressed_tweets/*.txt
+uncompressed_tweets/*.png
