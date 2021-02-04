@@ -80,7 +80,7 @@ async function tweetGrabber(url) {
   const dateText = await page.evaluate(tweetDateText => tweetDateText.textContent, tweetDateText);
 
   // write the tweet text and date to a txt file with the same ID as the screenshot
-  fs.writeFile(`${compressedTweetsDir}/${id}.txt`, `${bodyText} \r\n${dateText}`, function (err) {
+  fs.writeFile(`${compressedTweetsDir}/${id}.txt`, `${bodyText} - ${dateText}\r\n\r\n${url}`, function (err) {
     if (err) return console.log(err);
   });
 
