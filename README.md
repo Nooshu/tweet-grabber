@@ -45,6 +45,7 @@ The script comes with a few options:
 * `compressedTweetsDir`: Directory to save the compressed screenshots (default: `compressed_tweets`).
 * `compressedFileSuffix`: Add a suffix to the compressed screenshots (default: `_compressed`).
 * `jpegCompression`: Level of JPEG compression used for the compressed screenshots (default: `90`).
+* `cleanCompressedDirectory`: Clear out any files in the `compressed_tweets` folder when the script is run (default: `false`).
 
 ## License
 

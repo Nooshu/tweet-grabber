@@ -3,6 +3,7 @@
 // require some helpers
 const util = require('util');
 const fs = require('fs');
+const path = require('path');
 const exec = util.promisify(require('child_process').exec);
 const puppeteer = require('puppeteer');
 
@@ -14,6 +15,24 @@ const uncompressedTweetsDir = 'uncompressed_tweets';
 const compressedTweetsDir = 'compressed_tweets';
 const compressedFileSuffix = '_compressed';
 const jpegCompression = 90;
+const cleanCompressedDirectory = false;
+
+// clean the compressed tweets directory on startup
+if(cleanCompressedDirectory){
+  fs.readdir(`./${compressedTweetsDir}`, (err, files) => {
+    if (err) {
+      console.log(err);
+    }
+
+    files.forEach(file => {
+      const fileDir = path.join(`./${compressedTweetsDir}`, file);
+
+      if(file !== '.gitkeep') {
+        fs.unlinkSync(fileDir);
+      }
+    });
+  });
+}
 
 // has the user passed in a file?
 if(userarg && fs.existsSync(userarg) && fs.lstatSync(userarg).isFile()){
