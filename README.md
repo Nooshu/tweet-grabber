@@ -39,6 +39,16 @@ $ node index.js example-tweets.txt
 ## Output
 For each of the tweets the original screenshot is captured and saved to the `uncompressed_tweets` folder. A JPEG compressed version, along with the text from the tweet are saved to the `compressed_tweets` folder.
 
+## Example
+Running the following command:
+```
+$ node index.js https://twitter.com/TheRealNooshu/status/1350578919389470721
+```
+
+Generates the following compressed image (50 KB) and gathers the `alt` text used.
+
+![If you are wanting to reference a tweet on a page, don't embed, just use a simple image + alt text + link. Your users will thank you! • LCP: 600ms slower • 2.7MB more JS! () • 25 more requests • LH score dropped 50% Test: real Moto G4 with 3G Fast. #perfmatters #webperf - 11:01 PM · Jan 16, 2021](public/images/1350578919389470721_compressed.jpg)
+
 ## Options
 The script comes with a few options:
 * `uncompressedTweetsDir`: Directory to save the original screenshots (default: `uncompressed_tweets`).
