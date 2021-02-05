@@ -1,6 +1,6 @@
 # Tweet Grabber
 
-Simple Node / Puppeteer script to screenshot a tweet (or multiple tweets), recompress the screenshot using [Squoosh CLI](https://github.com/GoogleChromeLabs/squoosh/tree/dev/cli), and safe the tweet text into a separate text file.
+Simple Node / Puppeteer script to screenshot a tweet (or multiple tweets), recompress the screenshot using [Squoosh CLI](https://github.com/GoogleChromeLabs/squoosh/tree/dev/cli), and save the tweet text into a separate text file.
 
 ## Installation
 Clone the repo and use:
