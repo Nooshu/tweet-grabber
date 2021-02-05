@@ -1,7 +1,7 @@
 {
-  "name": "puppeteer-tweets",
-  "version": "1.0.0",
-  "description": "",
+  "name": "tweet-grabber",
+  "version": "0.0.1",
+  "description": "Puppeteer script to screenshot and recompress tweets.",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -11,5 +11,9 @@
   "dependencies": {
     "@squoosh/cli": "^0.6.1",
     "puppeteer": "^6.0.0"
+  },
+  "engines": {
+    "node": ">=10.0.0",
+    "npm": ">=6.0.0"
   }
 }
