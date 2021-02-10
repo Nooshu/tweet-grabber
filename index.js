@@ -6,6 +6,7 @@ const fs = require('fs');
 const path = require('path');
 const exec = util.promisify(require('child_process').exec);
 const puppeteer = require('puppeteer');
+const async = require("async");
 
 // store the argument the user passes in
 const userarg = process.argv[2];
@@ -15,7 +16,7 @@ const uncompressedTweetsDir = 'uncompressed_tweets';
 const compressedTweetsDir = 'compressed_tweets';
 const compressedFileSuffix = '_compressed';
 const jpegCompression = 90;
-const cleanCompressedDirectory = false;
+const cleanCompressedDirectory = true;
 
 // clean the compressed tweets directory on startup
 if(cleanCompressedDirectory){
@@ -36,14 +37,21 @@ if(cleanCompressedDirectory){
 
 // has the user passed in a file?
 if(userarg && fs.existsSync(userarg) && fs.lstatSync(userarg).isFile()){
-  // loop over the file line by line (sync)
-  fs.readFileSync(userarg).toString().split("\n").forEach(function(line, index, arr) {
-    if (index === arr.length - 1 && line === "") { return; }
-    tweetGrabber(line.trim());
+  // read the file into an array of URL's, trim the white space and remove empty strings
+  var urlArray = fs.readFileSync(userarg).toString().split("\n").map(url => url.trim()).filter(Boolean);
+  console.log(urlArray);
+
+  // run only 5 URL's at a time due to memory issues spinning up lots of puppeteer instances!
+  async.eachOfLimit(urlArray, 5, tweetGrabber, function(err){
+    if (err) {
+      console.error(err);
+      return;
+     }
+     console.log('URLs: Done');
   });
 } else if(userarg.includes(',')) { // assume multiple URL's have been passed
-  // split the string and remove and white space
-  let urlArray = userarg.split(",").map(url => url.trim());
+  // split the string and remove and white space and empty quotes
+  let urlArray = userarg.split(",").map(url => url.trim()).filter(Boolean);
   // loop over the URL's
   urlArray.forEach(function(url,index){
     tweetGrabber(url);
@@ -56,12 +64,13 @@ if(userarg && fs.existsSync(userarg) && fs.lstatSync(userarg).isFile()){
 
 /**
  * Puppeteer function used to capture an image of the tweet and extract the text from it too
- * @param {string} url tweet to be screenshotted
+ * @param {string} url tweet to be screen-shotted
  */
 async function tweetGrabber(url) {
+  console.info(`Working on ${url}`);
+
   // check see if this URL is from Twitter
   if(!url.includes('twitter.com')){
-    console.error("This URL isn't from Twitter");
     return;
   }
 
@@ -71,7 +80,7 @@ async function tweetGrabber(url) {
   let id = urlArray[3];
 
   // fire up browser and open a new page
-  const browser = await puppeteer.launch();
+  const browser = await puppeteer.launch({ headless: true });
   const page = await browser.newPage();
 
   // go to the selected tweet page, wait until the network is idle before proceeding
@@ -80,20 +89,14 @@ async function tweetGrabber(url) {
     waitUntil: 'networkidle0',
   });
 
-  // store the page title
-  const pageTitle = await page.title();
-
-  /**
-   * This is very flakey. Examining the page title to check is tweet has been deleted
-   * since we need to wait on Twitters JS hydration. Default title is "Tweet / Twitter"
-   * when not hydrated, and the <head> is quick to parse. Open to better ways to detect this!
-   */
-  if(pageTitle === "Tweet / Twitter") {
-    console.error(`Tweet: ${id} looks to have been deleted.`);
-    // write the error to a file with the same ID
+  // look to see if the tweet has been deleted
+  if (await page.$(`h1[data-testid="error-detail"]`) !== null) {
+    console.log(`Tweet: ${id} looks to have been deleted.`);
     fs.writeFile(`${compressedTweetsDir}/${id}.txt`, `There was an error with this tweet (${id}). Has it been deleted?\r\n\r\n${url}`, function (err) {
       if (err) return console.log(err);
     });
+    await browser.close();
+    return;
   } else {
     // tweet hasn't been deleted so wait for the tweet to exist in the DOM
     await page.waitForSelector('article[role="article"]');
